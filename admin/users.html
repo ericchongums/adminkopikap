@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Management - Kopi Kap Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f6fa;
+            color: #2d3436;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #0f6b3e 0%, #16a34a 100%);
+            padding: 30px 0;
+            color: white;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
+
+        .logo h1 {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .logo .admin-tag {
+            font-size: 0.8em;
+            opacity: 0.9;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin: 5px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 30px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left: 4px solid white;
+        }
+
+        .nav-link svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+        }
+
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            font-size: 1.8em;
+            color: #2d3436;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #ee5a52;
+            transform: translateY(-2px);
+        }
+
+        .users-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 15px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: #636e72;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-color: #10b981;
+        }
+
+        .add-barista-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .add-barista-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8f9fa;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #2d3436;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .role-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .role-badge.admin {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .role-badge.barista {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .role-badge.customer,
+        .role-badge.user {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-right: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .btn-edit:hover {
+            background: #2e7d32;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .btn-delete:hover {
+            background: #c62828;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #636e72;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h3 {
+            color: #2d3436;
+            font-size: 1.5em;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            font-weight: bold;
+            color: #636e72;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .close-btn:hover {
+            color: #2d3436;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1em;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-save {
+            flex: 1;
+            padding: 12px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 12px;
+            background: #e9ecef;
+            color: #636e72;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-cancel:hover {
+            background: #dee2e6;
+        }
+
+        .info-note {
+            background: #e8f5e9;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>Kopi Kap</h1>
+            <p class="admin-tag">Admin Portal</p>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                    </svg>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="orders.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                    </svg>
+                    Orders
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="products.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+                    </svg>
+                    Products
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="users.html" class="nav-link active">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                    </svg>
+                    Users
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="analytics.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                    </svg>
+                    Analytics
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h2>Users Management</h2>
+                <p style="color: #636e72; font-size: 0.9em;">Manage customers, baristas, and staff</p>
+            </div>
+            <div class="header-right">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div>
+                        <div style="font-weight: 600;" id="userName">Admin</div>
+                        <div style="font-size: 0.85em; color: #636e72;" id="userEmail">admin@kopikap.com</div>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="users-container">
+            <div class="toolbar">
+                <div class="filters">
+                    <button class="filter-btn active" onclick="filterUsers('all')">All Users</button>
+                    <button class="filter-btn" onclick="filterUsers('user')">Customers</button>
+                    <button class="filter-btn" onclick="filterUsers('barista')">Baristas</button>
+                    <button class="filter-btn" onclick="filterUsers('admin')">Admins</button>
+                </div>
+                <button class="add-barista-btn" onclick="openAddBaristaModal()">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                    </svg>
+                    Add Barista
+                </button>
+            </div>
+
+            <div id="usersContent">
+                <div class="loading" style="text-align: center; padding: 40px; color: #636e72;">Loading users...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barista Modal -->
+    <div id="baristaModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Barista</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="info-note">
+                Barista will be able to manage orders and view customers in the barista app.
+            </div>
+            <form id="baristaForm">
+                <input type="hidden" id="baristaId">
+
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="baristaName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="baristaEmail" required>
+                </div>
+
+                <div class="form-group" id="passwordGroup">
+                    <label>Password *</label>
+                    <input type="password" id="baristaPassword" minlength="6">
+                    <small style="color: #636e72; margin-top: 5px; display: block;">Min. 6 characters</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="baristaPhone" placeholder="+60123456789">
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Save Barista</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9EMyZgu7FsJOwzYB59DxdAJYTK5mwZqc",
+            authDomain: "finalyearproject-b3787.firebaseapp.com",
+            projectId: "finalyearproject-b3787",
+            storageBucket: "finalyearproject-b3787.firebasestorage.app",
+            messagingSenderId: "581749071416",
+            appId: "1:581749071416:android:ea60d7d3b7f238fa49d0cd"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let allUsers = [];
+        let currentFilter = 'all';
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (!userDoc.exists() || userDoc.data().role !== 'admin') {
+                    await signOut(auth);
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const userData = userDoc.data();
+                document.getElementById('userName').textContent = userData.name || 'Admin';
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('userAvatar').textContent = (userData.name || user.email)[0].toUpperCase();
+
+                loadUsers();
+            } catch (error) {
+                console.error('Auth error:', error);
+                window.location.href = 'login.html';
+            }
+        });
+
+        window.logout = async function() {
+            try {
+                await signOut(auth);
+                sessionStorage.removeItem('adminUser');
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        };
+
+        async function loadUsers() {
+            try {
+                const snapshot = await getDocs(collection(db, 'users'));
+
+                allUsers = [];
+                snapshot.forEach(doc => {
+                    allUsers.push({ id: doc.id, ...doc.data() });
+                });
+
+                displayUsers(allUsers);
+            } catch (error) {
+                console.error('Error loading users:', error);
+                document.getElementById('usersContent').innerHTML = `
+                    <div class="empty-state">
+                        <p>Error loading users: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayUsers(users) {
+            const container = document.getElementById('usersContent');
+
+            if (users.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No users found</h3>
+                        <p>Users will appear here once they register</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Registered</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${users.map(user => {
+                            const date = user.createdAt?.toDate();
+                            const dateStr = date ? date.toLocaleDateString('en-MY') : 'N/A';
+                            const canEdit = user.role === 'barista';
+                            const canDelete = user.role === 'barista';
+
+                            return `
+                                <tr>
+                                    <td><strong>${user.name || 'N/A'}</strong></td>
+                                    <td>${user.email || 'N/A'}</td>
+                                    <td>${user.phone || '-'}</td>
+                                    <td><span class="role-badge ${user.role || 'user'}">${user.role === 'user' ? 'Customer' : (user.role || 'Customer')}</span></td>
+                                    <td>${dateStr}</td>
+                                    <td>
+                                        ${canEdit ? `<button class="action-btn btn-edit" onclick="editBarista('${user.id}')">Edit</button>` : ''}
+                                        ${canDelete ? `<button class="action-btn btn-delete" onclick="deleteBarista('${user.id}', '${user.name}')">Delete</button>` : ''}
+                                        ${!canEdit && !canDelete ? '<span style="color: #636e72;">-</span>' : ''}
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        window.filterUsers = function(role) {
+            currentFilter = role;
+
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            let filtered = allUsers;
+            if (role !== 'all') {
+                filtered = allUsers.filter(user => (user.role || 'user') === role);
+            }
+
+            displayUsers(filtered);
+        };
+
+        window.openAddBaristaModal = function() {
+            document.getElementById('modalTitle').textContent = 'Add Barista';
+            document.getElementById('baristaForm').reset();
+            document.getElementById('baristaId').value = '';
+            document.getElementById('passwordGroup').style.display = 'block';
+            document.getElementById('baristaPassword').required = true;
+            document.getElementById('baristaModal').style.display = 'block';
+        };
+
+        window.editBarista = function(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Barista';
+            document.getElementById('baristaId').value = user.id;
+            document.getElementById('baristaName').value = user.name || '';
+            document.getElementById('baristaEmail').value = user.email || '';
+            document.getElementById('baristaPhone').value = user.phone || '';
+            document.getElementById('passwordGroup').style.display = 'none';
+            document.getElementById('baristaPassword').required = false;
+
+            document.getElementById('baristaModal').style.display = 'block';
+        };
+
+        window.deleteBarista = async function(userId, userName) {
+            if (!confirm(`Are you sure you want to delete barista "${userName}"?\n\nThis will remove their access to the barista app.`)) {
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, 'users', userId));
+                alert('Barista deleted successfully!');
+                loadUsers();
+            } catch (error) {
+                console.error('Error deleting barista:', error);
+                alert('Failed to delete barista: ' + error.message);
+            }
+        };
+
+        document.getElementById('baristaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const baristaId = document.getElementById('baristaId').value;
+            const baristaData = {
+                name: document.getElementById('baristaName').value,
+                email: document.getElementById('baristaEmail').value,
+                phone: document.getElementById('baristaPhone').value,
+                role: 'barista',
+                updatedAt: serverTimestamp()
+            };
+
+            try {
+                if (baristaId) {
+                    // Update existing barista
+                    await updateDoc(doc(db, 'users', baristaId), baristaData);
+                    alert('Barista updated successfully!');
+                } else {
+                    // Create new barista
+                    const password = document.getElementById('baristaPassword').value;
+                    const email = baristaData.email;
+
+                    // Create auth account
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const newUserId = userCredential.user.uid;
+
+                    // Create user document
+                    baristaData.createdAt = serverTimestamp();
+                    await setDoc(doc(db, 'users', newUserId), baristaData);
+
+                    alert('Barista added successfully!\n\nBarista credentials:\nEmail: ' + email + '\nPassword: ' + password);
+                }
+
+                closeModal();
+                loadUsers();
+            } catch (error) {
+                console.error('Error saving barista:', error);
+                let errorMsg = error.message;
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMsg = 'Email already in use. Please use a different email.';
+                }
+                alert('Failed to save barista: ' + errorMsg);
+            }
+        });
+
+        window.closeModal = function() {
+            document.getElementById('baristaModal').style.display = 'none';
+        };
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('baristaModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        };
+    </script>
+</body>
+</html>

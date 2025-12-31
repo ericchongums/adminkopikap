@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Monitoring - Kopi Kap Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f6fa;
+            color: #2d3436;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #0f6b3e 0%, #16a34a 100%);
+            padding: 30px 0;
+            color: white;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
+
+        .logo h1 {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .logo .admin-tag {
+            font-size: 0.8em;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin: 5px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 30px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left: 4px solid white;
+        }
+
+        .nav-link svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+        }
+
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            font-size: 1.8em;
+            color: #2d3436;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #ee5a52;
+            transform: translateY(-2px);
+        }
+
+        .orders-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: #636e72;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-color: #10b981;
+        }
+
+        .filter-btn:hover {
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        .filter-btn.active:hover {
+            color: white;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8f9fa;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #2d3436;
+            border-bottom: 2px solid #e9ecef;
+            font-size: 0.9em;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.9em;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .status-badge.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge.preparing {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-badge.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-right: 5px;
+        }
+
+        .btn-view {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .btn-view:hover {
+            background: #1976d2;
+            color: white;
+        }
+
+        .btn-update {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .btn-update:hover {
+            background: #2e7d32;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #636e72;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #636e72;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            color: #2d3436;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            font-weight: bold;
+            color: #636e72;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .close-btn:hover {
+            color: #2d3436;
+        }
+
+        .order-detail {
+            margin-bottom: 15px;
+        }
+
+        .order-detail label {
+            font-weight: 600;
+            color: #636e72;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .order-detail p {
+            color: #2d3436;
+        }
+
+        .status-select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            width: 100%;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .status-select:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>Kopi Kap</h1>
+            <p class="admin-tag">Admin Portal</p>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                    </svg>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="orders.html" class="nav-link active">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                    </svg>
+                    Orders
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="products.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+                    </svg>
+                    Products
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="users.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                    </svg>
+                    Users
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="analytics.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                    </svg>
+                    Analytics
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h2>Order Monitoring</h2>
+                <p style="color: #636e72; font-size: 0.9em;">Monitor order progress in real-time</p>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div>
+                        <div style="font-weight: 600;" id="userName">Admin</div>
+                        <div style="font-size: 0.85em; color: #636e72;" id="userEmail">admin@kopikap.com</div>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="orders-container">
+            <div class="filters">
+                <button class="filter-btn active" onclick="filterOrders('all')">All Orders</button>
+                <button class="filter-btn" onclick="filterOrders('pending')">Pending</button>
+                <button class="filter-btn" onclick="filterOrders('preparing')">Preparing</button>
+                <button class="filter-btn" onclick="filterOrders('completed')">Completed</button>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search by order number, customer name..." onkeyup="searchOrders()">
+                </div>
+            </div>
+
+            <div id="ordersContent">
+                <div class="loading">Loading orders...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Order Details</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, getDocs, query, orderBy, limit, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9EMyZgu7FsJOwzYB59DxdAJYTK5mwZqc",
+            authDomain: "finalyearproject-b3787.firebaseapp.com",
+            projectId: "finalyearproject-b3787",
+            storageBucket: "finalyearproject-b3787.firebasestorage.app",
+            messagingSenderId: "581749071416",
+            appId: "1:581749071416:android:ea60d7d3b7f238fa49d0cd"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let allOrders = [];
+        let currentFilter = 'all';
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (!userDoc.exists() || userDoc.data().role !== 'admin') {
+                    await signOut(auth);
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const userData = userDoc.data();
+                document.getElementById('userName').textContent = userData.name || 'Admin';
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('userAvatar').textContent = (userData.name || user.email)[0].toUpperCase();
+
+                loadOrders();
+            } catch (error) {
+                console.error('Auth error:', error);
+                window.location.href = 'login.html';
+            }
+        });
+
+        window.logout = async function() {
+            try {
+                await signOut(auth);
+                sessionStorage.removeItem('adminUser');
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        };
+
+        async function loadOrders() {
+            try {
+                console.log('=== STARTING TO LOAD ORDERS ===');
+                console.log('Firestore database:', db);
+                console.log('Current auth user:', auth.currentUser);
+                console.log('User email:', auth.currentUser?.email);
+                console.log('User UID:', auth.currentUser?.uid);
+
+                // TEST: Check if we can read user document (to verify admin role)
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+                    console.log('✓ User document exists:', userDoc.exists());
+                    if (userDoc.exists()) {
+                        console.log('User role:', userDoc.data().role);
+                        if (userDoc.data().role === 'admin') {
+                            console.log('✓ Confirmed user is ADMIN');
+                        } else {
+                            console.error('❌ User is NOT admin! Role:', userDoc.data().role);
+                        }
+                    } else {
+                        console.error('❌ User document NOT FOUND in users collection!');
+                    }
+                } catch (e) {
+                    console.error('❌ Cannot read user document:', e);
+                }
+
+                allOrders = [];
+
+                // Load from BOTH collections and filter by orderStatus
+                // We want to show: pending, preparing, completed
+
+                try {
+                    console.log('Loading from "orders" collection...');
+                    const ordersSnapshot = await getDocs(collection(db, 'orders'));
+                    console.log('Orders collection - Snapshot size:', ordersSnapshot.size);
+
+                    ordersSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        const orderStatus = data.orderStatus || data.status || 'unknown';
+
+                        console.log('Order from orders:', doc.id, 'Status:', orderStatus);
+
+                        // Only add orders with status: pending, preparing, or completed
+                        if (['pending', 'preparing', 'completed'].includes(orderStatus.toLowerCase())) {
+                            allOrders.push({
+                                id: doc.id,
+                                source: 'orders',
+                                ...data
+                            });
+                        } else {
+                            console.log('Skipping order with status:', orderStatus);
+                        }
+                    });
+                    console.log('✓ Loaded from "orders" collection:', ordersSnapshot.size);
+                } catch (error) {
+                    console.error('❌ ERROR loading from orders collection:', error);
+                    console.error('Error code:', error.code);
+                    console.error('Error message:', error.message);
+                }
+
+                try {
+                    console.log('Loading from "completed_orders" collection...');
+                    const completedSnapshot = await getDocs(collection(db, 'completed_orders'));
+                    console.log('Completed_orders collection - Snapshot size:', completedSnapshot.size);
+
+                    completedSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        const orderStatus = data.orderStatus || data.status || 'completed';
+
+                        console.log('Order from completed_orders:', doc.id, 'Status:', orderStatus);
+
+                        // Only add orders with status: pending, preparing, or completed
+                        if (['pending', 'preparing', 'completed'].includes(orderStatus.toLowerCase())) {
+                            allOrders.push({
+                                id: doc.id,
+                                source: 'completed_orders',
+                                ...data
+                            });
+                        } else {
+                            console.log('Skipping completed order with status:', orderStatus);
+                        }
+                    });
+                    console.log('✓ Loaded from "completed_orders" collection:', completedSnapshot.size);
+                } catch (error) {
+                    console.error('❌ ERROR loading from completed_orders collection:', error);
+                    console.error('Error code:', error.code);
+                    console.error('Error message:', error.message);
+                }
+
+                console.log('=== ORDERS LOADED ===');
+                console.log('Total orders from both collections:', allOrders.length);
+
+                if (allOrders.length > 0) {
+                    console.log('First order:', allOrders[0]);
+                    console.log('Available fields:', Object.keys(allOrders[0]));
+                    console.log('Full first order:', JSON.stringify(allOrders[0], null, 2));
+                } else {
+                    console.warn('NO ORDERS FOUND IN BOTH COLLECTIONS!');
+                }
+
+                // Sort manually by timestamp (most recent first)
+                allOrders.sort((a, b) => {
+                    const aTime = a.timestamp || a.createdAt || a.date;
+                    const bTime = b.timestamp || b.createdAt || b.date;
+                    if (!aTime) return 1;
+                    if (!bTime) return -1;
+                    const aDate = aTime.toDate ? aTime.toDate() : new Date(aTime);
+                    const bDate = bTime.toDate ? bTime.toDate() : new Date(bTime);
+                    return bDate - aDate;
+                });
+
+                displayOrders(allOrders);
+            } catch (error) {
+                console.error('=== ERROR LOADING ORDERS ===');
+                console.error('Error type:', error.name);
+                console.error('Error message:', error.message);
+                console.error('Full error:', error);
+                document.getElementById('ordersContent').innerHTML = `
+                    <div class="empty-state">
+                        <p style="color: #d63031;">Error loading orders: ${error.message}</p>
+                        <p style="font-size: 0.9em; margin-top: 10px;">Check browser console (F12) for more details</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayOrders(orders) {
+            const container = document.getElementById('ordersContent');
+
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <h3>Belum ada order</h3>
+                        <p>Orders akan muncul di sini bila customer membuat order</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Coffee</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${orders.map(order => {
+                            // Handle timestamp - primary field is 'createdAt'
+                            const timestamp = order.createdAt || order.timestamp || order.date;
+                            const date = timestamp?.toDate ? timestamp.toDate() : (timestamp ? new Date(timestamp) : null);
+                            const dateStr = date ? date.toLocaleDateString('en-MY', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            }) : 'N/A';
+
+                            // Price field is 'totalAmount'
+                            const price = order.totalAmount || order.totalPrice || order.total || order.price || 0;
+
+                            // Status field is 'orderStatus'
+                            const status = order.orderStatus || order.status || 'pending';
+
+                            // Coffee name and quantity from items array
+                            let coffeeName = 'N/A';
+                            let itemCount = 0;
+
+                            if (order.items && Array.isArray(order.items) && order.items.length > 0) {
+                                coffeeName = order.items[0].coffeeName || order.items[0].name || 'Unknown';
+                                itemCount = order.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                            } else {
+                                // Fallback to direct fields if items array doesn't exist
+                                coffeeName = order.coffeeName || 'N/A';
+                                itemCount = order.totalItems || order.quantity || 1;
+                            }
+
+                            // Customer name/email
+                            const customerName = order.userName || order.customerName || order.userEmail || 'Customer';
+
+                            return `
+                                <tr>
+                                    <td><strong>#${order.orderNumber || order.orderId || order.id.substring(0, 8)}</strong></td>
+                                    <td>${customerName}</td>
+                                    <td>${coffeeName}</td>
+                                    <td>${itemCount}</td>
+                                    <td><strong>RM ${price.toFixed(2)}</strong></td>
+                                    <td><span class="status-badge ${status}">${status}</span></td>
+                                    <td>${dateStr}</td>
+                                    <td>
+                                        <button class="action-btn btn-view" onclick="viewOrder('${order.id}')">View Details</button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        window.filterOrders = function(status) {
+            currentFilter = status;
+
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            let filtered = allOrders;
+            if (status !== 'all') {
+                filtered = allOrders.filter(order => {
+                    const orderStatus = order.orderStatus || order.status || 'pending';
+                    return orderStatus === status;
+                });
+            }
+
+            displayOrders(filtered);
+        };
+
+        window.searchOrders = function() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            let filtered = allOrders;
+            if (currentFilter !== 'all') {
+                filtered = allOrders.filter(order => {
+                    const orderStatus = order.orderStatus || order.status || 'pending';
+                    return orderStatus === currentFilter;
+                });
+            }
+
+            if (searchTerm) {
+                filtered = filtered.filter(order => {
+                    const orderNum = (order.orderNumber || '').toString().toLowerCase();
+                    const userName = (order.userName || order.customerName || '').toLowerCase();
+
+                    let coffeeName = (order.coffeeName || '').toLowerCase();
+                    if (order.items && order.items.length > 0) {
+                        coffeeName = (order.items[0].coffeeName || order.items[0].name || '').toLowerCase();
+                    }
+
+                    return orderNum.includes(searchTerm) ||
+                           userName.includes(searchTerm) ||
+                           coffeeName.includes(searchTerm);
+                });
+            }
+
+            displayOrders(filtered);
+        };
+
+        window.viewOrder = async function(orderId) {
+            const order = allOrders.find(o => o.id === orderId);
+            if (!order) return;
+
+            // Timestamp - primary field is 'createdAt'
+            const timestamp = order.createdAt || order.timestamp || order.date;
+            const date = timestamp?.toDate ? timestamp.toDate() : (timestamp ? new Date(timestamp) : null);
+            const dateStr = date ? date.toLocaleString('en-MY') : 'N/A';
+
+            // Price is 'totalAmount'
+            const price = order.totalAmount || order.totalPrice || order.total || order.price || 0;
+            const subtotal = order.subtotal || 0;
+            const sst = order.sst || 0;
+
+            // Status is 'orderStatus'
+            const status = order.orderStatus || order.status || 'pending';
+            const paymentStatus = order.paymentStatus || 'unknown';
+
+            // Customer info
+            const customerName = order.userName || order.customerName || 'N/A';
+            const customerEmail = order.userEmail || 'N/A';
+
+            // Build items details from items array
+            let itemsDetails = '';
+            let totalQuantity = 0;
+
+            if (order.items && Array.isArray(order.items) && order.items.length > 0) {
+                itemsDetails = '<div class="order-detail"><label>Items:</label><ul style="margin-top: 10px; list-style: none; padding: 0;">';
+                order.items.forEach(item => {
+                    const name = item.coffeeName || item.name || 'Unknown';
+                    const qty = item.quantity || 1;
+                    const itemPrice = item.price || 0;
+                    const customization = item.customizations || '';
+                    const size = item.size || '';
+                    const variant = item.variant || '';
+
+                    totalQuantity += qty;
+
+                    itemsDetails += `
+                        <li style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <strong>${name}</strong>
+                                <strong>RM ${itemPrice.toFixed(2)}</strong>
+                            </div>
+                            ${size || variant ? `<div style="font-size: 0.9em; color: #636e72;">${variant}${variant && size ? ' | ' : ''}${size}</div>` : ''}
+                            ${customization ? `<div style="font-size: 0.85em; color: #636e72; margin-top: 3px;">${customization}</div>` : ''}
+                            <div style="font-size: 0.9em; color: #636e72; margin-top: 3px;">Quantity: ${qty}</div>
+                        </li>
+                    `;
+                });
+                itemsDetails += '</ul></div>';
+            }
+
+            const html = `
+                <div class="order-detail">
+                    <label>Order ID:</label>
+                    <p><strong>#${order.orderNumber || order.orderId || order.id.substring(0, 8)}</strong></p>
+                </div>
+                <div class="order-detail">
+                    <label>Customer Name:</label>
+                    <p>${customerName}</p>
+                </div>
+                <div class="order-detail">
+                    <label>Customer Email:</label>
+                    <p>${customerEmail}</p>
+                </div>
+                ${itemsDetails}
+                <div class="order-detail">
+                    <label>Subtotal:</label>
+                    <p>RM ${subtotal.toFixed(2)}</p>
+                </div>
+                ${sst > 0 ? `
+                <div class="order-detail">
+                    <label>SST (6%):</label>
+                    <p>RM ${sst.toFixed(2)}</p>
+                </div>
+                ` : ''}
+                <div class="order-detail">
+                    <label>Total Amount:</label>
+                    <p><strong style="font-size: 1.2em;">RM ${price.toFixed(2)}</strong></p>
+                </div>
+                <div class="order-detail">
+                    <label>Order Status:</label>
+                    <p><span class="status-badge ${status}">${status}</span></p>
+                </div>
+                <div class="order-detail">
+                    <label>Payment Status:</label>
+                    <p><strong>${paymentStatus}</strong></p>
+                </div>
+                ${order.paymentMethod ? `
+                <div class="order-detail">
+                    <label>Payment Method:</label>
+                    <p>${order.paymentMethod}</p>
+                </div>
+                ` : ''}
+                <div class="order-detail">
+                    <label>Order Date:</label>
+                    <p>${dateStr}</p>
+                </div>
+                ${order.pickupNumber ? `
+                <div class="order-detail">
+                    <label>Pickup Number:</label>
+                    <p><strong style="font-size: 1.5em; color: #10b981;">#${order.pickupNumber}</strong></p>
+                </div>
+                ` : ''}
+                ${order.pickupLocation ? `
+                <div class="order-detail">
+                    <label>Pickup Location:</label>
+                    <p>${order.pickupLocation}</p>
+                </div>
+                ` : ''}
+                ${order.specialInstructions ? `
+                <div class="order-detail">
+                    <label>Special Instructions:</label>
+                    <p>${order.specialInstructions}</p>
+                </div>
+                ` : ''}
+            `;
+
+            document.getElementById('modalBody').innerHTML = html;
+            document.getElementById('orderModal').style.display = 'block';
+        };
+
+
+        window.closeModal = function() {
+            document.getElementById('orderModal').style.display = 'none';
+        };
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('orderModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        };
+    </script>
+</body>
+</html>

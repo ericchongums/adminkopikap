@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Management - Kopi Kap Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f6fa;
+            color: #2d3436;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #0f6b3e 0%, #16a34a 100%);
+            padding: 30px 0;
+            color: white;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
+
+        .logo h1 {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .logo .admin-tag {
+            font-size: 0.8em;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin: 5px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 30px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left: 4px solid white;
+        }
+
+        .nav-link svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+        }
+
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            font-size: 1.8em;
+            color: #2d3436;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #ee5a52;
+            transform: translateY(-2px);
+        }
+
+        .products-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 15px;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+
+        .add-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border-color: #10b981;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f8f9fa;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 8px;
+        }
+
+        .product-category {
+            font-size: 0.85em;
+            color: #636e72;
+            margin-bottom: 12px;
+        }
+
+        .product-price {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #10b981;
+            margin-bottom: 15px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-edit {
+            flex: 1;
+            padding: 8px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit:hover {
+            background: #2e7d32;
+            color: white;
+        }
+
+        .btn-delete {
+            flex: 1;
+            padding: 8px;
+            background: #ffebee;
+            color: #c62828;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-delete:hover {
+            background: #c62828;
+            color: white;
+        }
+
+        .availability-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .availability-badge.available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .availability-badge.unavailable {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #636e72;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 3% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h3 {
+            color: #2d3436;
+            font-size: 1.5em;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            font-weight: bold;
+            color: #636e72;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .close-btn:hover {
+            color: #2d3436;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1em;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-save {
+            flex: 1;
+            padding: 12px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 12px;
+            background: #e9ecef;
+            color: #636e72;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-cancel:hover {
+            background: #dee2e6;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #636e72;
+        }
+
+        /* Category Filter Styles */
+        .category-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .category-chip {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid #10b981;
+            background: white;
+            color: #10b981;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .category-chip:hover {
+            background: #e6f7f1;
+        }
+
+        .category-chip.active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-color: #10b981;
+        }
+
+        .add-category-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .add-category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>Kopi Kap</h1>
+            <p class="admin-tag">Admin Portal</p>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                    </svg>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="orders.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                    </svg>
+                    Orders
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="products.html" class="nav-link active">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+                    </svg>
+                    Products
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="users.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                    </svg>
+                    Users
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="analytics.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                    </svg>
+                    Analytics
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h2>Products Management</h2>
+                <p style="color: #636e72; font-size: 0.9em;">Manage coffee products and menu</p>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div>
+                        <div style="font-weight: 600;" id="userName">Admin</div>
+                        <div style="font-size: 0.85em; color: #636e72;" id="userEmail">admin@kopikap.com</div>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="products-container">
+            <div class="toolbar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search products..." onkeyup="searchProducts()">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="add-category-btn" onclick="openAddCategoryModal()">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                        </svg>
+                        Add Category
+                    </button>
+                    <button class="add-btn" onclick="openAddModal()">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                        </svg>
+                        Add Product
+                    </button>
+                </div>
+            </div>
+
+            <!-- Category Filters -->
+            <div class="category-filters" id="categoryFilters">
+                <div class="category-chip active" onclick="filterByCategory('All')">All Products</div>
+                <!-- Dynamic category chips will be added here -->
+            </div>
+
+            <div id="productsContent">
+                <div class="loading">Loading products...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Product</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="productForm">
+                <input type="hidden" id="productId">
+
+                <div class="form-group">
+                    <label>Product Name *</label>
+                    <input type="text" id="productName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Category *</label>
+                    <select id="productCategory" required>
+                        <option value="">Select category</option>
+                        <!-- Categories will be loaded dynamically from Firestore -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Price (RM) *</label>
+                    <input type="number" id="productPrice" step="0.01" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="productDescription" placeholder="Enter product description..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Product Image *</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="file" id="imageFileInput" accept="image/*" style="display: none;">
+                        <button type="button" class="btn-save" onclick="document.getElementById('imageFileInput').click()" style="flex: 0 0 auto; padding: 10px 20px;">
+                            📷 Choose Image
+                        </button>
+                        <span id="imageFileName" style="color: #636e72; font-size: 0.9em;">No image selected</span>
+                    </div>
+                    <input type="hidden" id="productImageUrl">
+                    <div id="imagePreview" style="margin-top: 10px; display: none;">
+                        <img id="previewImg" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #e0e0e0;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Availability</label>
+                    <select id="productAvailable">
+                        <option value="true">Available</option>
+                        <option value="false">Not Available</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div id="categoryModal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3>Add New Category</h3>
+                <button class="close-btn" onclick="closeCategoryModal()">&times;</button>
+            </div>
+            <form id="categoryForm">
+                <div class="form-group">
+                    <label>Category Name *</label>
+                    <input type="text" id="categoryName" placeholder="e.g. Espresso, Americano" required>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeCategoryModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Add Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9EMyZgu7FsJOwzYB59DxdAJYTK5mwZqc",
+            authDomain: "finalyearproject-b3787.firebaseapp.com",
+            projectId: "finalyearproject-b3787",
+            storageBucket: "finalyearproject-b3787.firebasestorage.app",
+            messagingSenderId: "581749071416",
+            appId: "1:581749071416:android:ea60d7d3b7f238fa49d0cd"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        let allProducts = [];
+        let allCategories = [];
+        let selectedImageFile = null;
+        let selectedCategory = 'All';
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (!userDoc.exists() || userDoc.data().role !== 'admin') {
+                    await signOut(auth);
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const userData = userDoc.data();
+                document.getElementById('userName').textContent = userData.name || 'Admin';
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('userAvatar').textContent = (userData.name || user.email)[0].toUpperCase();
+
+                loadCategories();
+                loadProducts();
+            } catch (error) {
+                console.error('Auth error:', error);
+                window.location.href = 'login.html';
+            }
+        });
+
+        window.logout = async function() {
+            try {
+                await signOut(auth);
+                sessionStorage.removeItem('adminUser');
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        };
+
+        async function loadCategories() {
+            try {
+                const snapshot = await getDocs(collection(db, 'categories'));
+
+                allCategories = [];
+                const categorySelect = document.getElementById('productCategory');
+                const categoryFilters = document.getElementById('categoryFilters');
+
+                // Clear existing options except the first one
+                categorySelect.innerHTML = '<option value="">Select category</option>';
+
+                // Clear filter chips except "All Products"
+                categoryFilters.innerHTML = '<div class="category-chip active" onclick="filterByCategory(\'All\')">All Products</div>';
+
+                snapshot.forEach(doc => {
+                    const category = { id: doc.id, ...doc.data() };
+                    allCategories.push(category);
+
+                    // Add option to dropdown
+                    const option = document.createElement('option');
+                    option.value = category.name;
+                    option.textContent = category.name;
+                    categorySelect.appendChild(option);
+
+                    // Add filter chip
+                    const chip = document.createElement('div');
+                    chip.className = 'category-chip';
+                    chip.textContent = category.name;
+                    chip.onclick = () => filterByCategory(category.name);
+                    categoryFilters.appendChild(chip);
+                });
+
+                console.log('Categories loaded:', allCategories.length);
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                alert('Failed to load categories: ' + error.message);
+            }
+        }
+
+        async function loadProducts() {
+            try {
+                const snapshot = await getDocs(collection(db, 'coffees'));
+
+                allProducts = [];
+                snapshot.forEach(doc => {
+                    allProducts.push({ id: doc.id, ...doc.data() });
+                });
+
+                displayProducts(allProducts);
+            } catch (error) {
+                console.error('Error loading products:', error);
+                document.getElementById('productsContent').innerHTML = `
+                    <div class="empty-state">
+                        <p>Error loading products: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayProducts(products) {
+            const container = document.getElementById('productsContent');
+
+            if (products.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                        <h3>No products yet</h3>
+                        <p>Click "Add Product" to create your first product</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = `
+                <div class="products-grid">
+                    ${products.map(product => `
+                        <div class="product-card">
+                            <img src="${product.imageUrl || 'https://via.placeholder.com/280x200?text=No+Image'}"
+                                 alt="${product.name}"
+                                 class="product-image"
+                                 onerror="this.src='https://via.placeholder.com/280x200?text=No+Image'">
+                            <div class="product-info">
+                                <span class="availability-badge ${product.available !== false ? 'available' : 'unavailable'}">
+                                    ${product.available !== false ? 'Available' : 'Not Available'}
+                                </span>
+                                <div class="product-name">${product.name}</div>
+                                <div class="product-category">${product.category || 'Uncategorized'}</div>
+                                <div class="product-price">RM ${parseFloat(product.price || 0).toFixed(2)}</div>
+                                <div class="product-actions">
+                                    <button class="btn-edit" onclick="editProduct('${product.id}')">Edit</button>
+                                    <button class="btn-delete" onclick="deleteProduct('${product.id}', '${product.name}')">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        window.searchProducts = function() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            if (!searchTerm) {
+                displayProducts(allProducts);
+                return;
+            }
+
+            const filtered = allProducts.filter(product => {
+                const name = (product.name || '').toLowerCase();
+                const category = (product.category || '').toLowerCase();
+                const description = (product.description || '').toLowerCase();
+
+                return name.includes(searchTerm) ||
+                       category.includes(searchTerm) ||
+                       description.includes(searchTerm);
+            });
+
+            displayProducts(filtered);
+        };
+
+        // Handle image file selection
+        document.getElementById('imageFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                selectedImageFile = file;
+                document.getElementById('imageFileName').textContent = file.name;
+
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        async function uploadImage(file) {
+            try {
+                // Create a unique filename
+                const timestamp = Date.now();
+                const filename = `products/${timestamp}_${file.name}`;
+                const storageRef = ref(storage, filename);
+
+                // Upload file
+                const snapshot = await uploadBytes(storageRef, file);
+
+                // Get download URL
+                const downloadURL = await getDownloadURL(snapshot.ref);
+
+                return downloadURL;
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                throw error;
+            }
+        }
+
+        window.openAddModal = function() {
+            document.getElementById('modalTitle').textContent = 'Add Product';
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('productAvailable').value = 'true';
+            document.getElementById('productImageUrl').value = '';
+            document.getElementById('imageFileName').textContent = 'No image selected';
+            document.getElementById('imagePreview').style.display = 'none';
+            selectedImageFile = null;
+            document.getElementById('productModal').style.display = 'block';
+        };
+
+        window.editProduct = function(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Product';
+            document.getElementById('productId').value = product.id;
+            document.getElementById('productName').value = product.name || '';
+            document.getElementById('productCategory').value = product.category || '';
+            document.getElementById('productPrice').value = product.price || '';
+            document.getElementById('productDescription').value = product.description || '';
+            document.getElementById('productImageUrl').value = product.imageUrl || '';
+            document.getElementById('productAvailable').value = product.available !== false ? 'true' : 'false';
+
+            // Show existing image preview
+            if (product.imageUrl) {
+                document.getElementById('previewImg').src = product.imageUrl;
+                document.getElementById('imagePreview').style.display = 'block';
+                document.getElementById('imageFileName').textContent = 'Current image loaded';
+            } else {
+                document.getElementById('imagePreview').style.display = 'none';
+                document.getElementById('imageFileName').textContent = 'No image selected';
+            }
+
+            selectedImageFile = null;
+            document.getElementById('productModal').style.display = 'block';
+        };
+
+        window.deleteProduct = async function(productId, productName) {
+            if (!confirm(`Are you sure you want to delete "${productName}"?`)) {
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, 'coffees', productId));
+                alert('Product deleted successfully!');
+                loadProducts();
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                alert('Failed to delete product: ' + error.message);
+            }
+        };
+
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const productId = document.getElementById('productId').value;
+            let imageUrl = document.getElementById('productImageUrl').value;
+
+            try {
+                // Upload new image if selected
+                if (selectedImageFile) {
+                    const uploadBtn = document.querySelector('.btn-save');
+                    uploadBtn.textContent = 'Uploading image...';
+                    uploadBtn.disabled = true;
+
+                    imageUrl = await uploadImage(selectedImageFile);
+
+                    uploadBtn.textContent = 'Save Product';
+                    uploadBtn.disabled = false;
+                }
+
+                // Validate image URL
+                if (!imageUrl) {
+                    alert('Please select an image for the product');
+                    return;
+                }
+
+                const productData = {
+                    name: document.getElementById('productName').value,
+                    category: document.getElementById('productCategory').value,
+                    price: parseFloat(document.getElementById('productPrice').value),
+                    description: document.getElementById('productDescription').value,
+                    imageUrl: imageUrl,
+                    available: document.getElementById('productAvailable').value === 'true',
+                    updatedAt: serverTimestamp()
+                };
+
+                if (productId) {
+                    await updateDoc(doc(db, 'coffees', productId), productData);
+                    alert('Product updated successfully!');
+                } else {
+                    productData.createdAt = serverTimestamp();
+                    await addDoc(collection(db, 'coffees'), productData);
+                    alert('Product added successfully!');
+                }
+
+                closeModal();
+                loadProducts();
+            } catch (error) {
+                console.error('Error saving product:', error);
+                alert('Failed to save product: ' + error.message);
+
+                // Re-enable button
+                const uploadBtn = document.querySelector('.btn-save');
+                uploadBtn.textContent = 'Save Product';
+                uploadBtn.disabled = false;
+            }
+        });
+
+        window.closeModal = function() {
+            document.getElementById('productModal').style.display = 'none';
+        };
+
+        window.onclick = function(event) {
+            const productModal = document.getElementById('productModal');
+            const categoryModal = document.getElementById('categoryModal');
+
+            if (event.target == productModal) {
+                closeModal();
+            }
+            if (event.target == categoryModal) {
+                closeCategoryModal();
+            }
+        };
+
+        // Category Filter Function
+        window.filterByCategory = function(category) {
+            selectedCategory = category;
+
+            // Update active chip
+            const chips = document.querySelectorAll('.category-chip');
+            chips.forEach(chip => {
+                if (chip.textContent === category || (category === 'All' && chip.textContent === 'All Products')) {
+                    chip.classList.add('active');
+                } else {
+                    chip.classList.remove('active');
+                }
+            });
+
+            // Filter products
+            if (category === 'All') {
+                displayProducts(allProducts);
+            } else {
+                const filtered = allProducts.filter(product => product.category === category);
+                displayProducts(filtered);
+            }
+        };
+
+        // Category Modal Functions
+        window.openAddCategoryModal = function() {
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryModal').style.display = 'block';
+        };
+
+        window.closeCategoryModal = function() {
+            document.getElementById('categoryModal').style.display = 'none';
+        };
+
+        // Category Form Submit
+        document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const categoryName = document.getElementById('categoryName').value.trim();
+
+            // Check if category already exists
+            const exists = allCategories.some(cat =>
+                cat.name.toLowerCase() === categoryName.toLowerCase()
+            );
+
+            if (exists) {
+                alert('Category already exists!');
+                return;
+            }
+
+            try {
+                const categoryData = {
+                    name: categoryName,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                };
+
+                await addDoc(collection(db, 'categories'), categoryData);
+
+                alert('Category added successfully!');
+                closeCategoryModal();
+
+                // Reload categories to update dropdown and filters
+                loadCategories();
+            } catch (error) {
+                console.error('Error adding category:', error);
+                alert('Failed to add category: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

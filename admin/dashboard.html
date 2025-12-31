@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Kopi Kap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f6fa;
+            color: #2d3436;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #0f6b3e 0%, #16a34a 100%);
+            padding: 30px 0;
+            color: white;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
+
+        .logo h1 {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .logo .admin-tag {
+            font-size: 0.8em;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin: 5px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 30px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left: 4px solid white;
+        }
+
+        .nav-link svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+        }
+
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            font-size: 1.8em;
+            color: #2d3436;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #ee5a52;
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .stat-icon.revenue {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .stat-icon.orders {
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+        }
+
+        .stat-icon.customers {
+            background: linear-gradient(135deg, #6ee7b7 0%, #34d399 100%);
+        }
+
+        .stat-icon.products {
+            background: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 100%);
+        }
+
+        .stat-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .stat-label {
+            color: #636e72;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #2d3436;
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            font-size: 0.85em;
+            color: #00b894;
+            font-weight: 500;
+        }
+
+        .stat-change.negative {
+            color: #d63031;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .chart-header {
+            margin-bottom: 20px;
+        }
+
+        .chart-header h3 {
+            font-size: 1.3em;
+            color: #2d3436;
+            margin-bottom: 5px;
+        }
+
+        .chart-header p {
+            color: #636e72;
+            font-size: 0.9em;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .orders-table {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .table-header h3 {
+            font-size: 1.3em;
+            color: #2d3436;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: #f5f6fa;
+            border: 1px solid #dfe6e9;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: #dfe6e9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8f9fa;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #2d3436;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .status-badge.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge.processing {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-badge.ready {
+            background: #d1f2eb;
+            color: #0c5460;
+        }
+
+        .status-badge.cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>Kopi Kap</h1>
+            <p class="admin-tag">Admin Portal</p>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link active">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                    </svg>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="orders.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                    </svg>
+                    Orders
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="products.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+                    </svg>
+                    Products
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="users.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                    </svg>
+                    Users
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="analytics.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                    </svg>
+                    Analytics
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h2>Dashboard Overview</h2>
+                <p style="color: #636e72; font-size: 0.9em;">Welcome back, Admin</p>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div>
+                        <div style="font-weight: 600;" id="userName">Admin</div>
+                        <div style="font-size: 0.85em; color: #636e72;" id="userEmail">admin@kopikap.com</div>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-label">Total Revenue</div>
+                        <div class="stat-value" id="totalRevenue">RM 0</div>
+                        <div class="stat-change" id="revenueChange">From all paid orders</div>
+                    </div>
+                    <div class="stat-icon revenue">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-label">Total Orders</div>
+                        <div class="stat-value" id="totalOrders">0</div>
+                        <div class="stat-change" id="ordersChange">Completed orders</div>
+                    </div>
+                    <div class="stat-icon orders">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-label">Total Customers</div>
+                        <div class="stat-value" id="totalCustomers">0</div>
+                        <div class="stat-change" id="customersChange">Unique customers</div>
+                    </div>
+                    <div class="stat-icon customers">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-label">Active Products</div>
+                        <div class="stat-value" id="totalProducts">0</div>
+                        <div class="stat-change" id="productsChange">In stock</div>
+                    </div>
+                    <div class="stat-icon products">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Revenue This Month</h3>
+                    <p>Daily revenue breakdown for current month</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Orders by Coffee Category</h3>
+                    <p>Most popular coffee categories</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="orders-table">
+            <div class="table-header">
+                <h3>Recent Orders</h3>
+                <button class="filter-btn">View All</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Products</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px;">Loading orders...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, getDocs, query, orderBy, limit, where, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9EMyZgu7FsJOwzYB59DxdAJYTK5mwZqc",
+            authDomain: "finalyearproject-b3787.firebaseapp.com",
+            projectId: "finalyearproject-b3787",
+            storageBucket: "finalyearproject-b3787.firebasestorage.app",
+            messagingSenderId: "581749071416",
+            appId: "1:581749071416:android:ea60d7d3b7f238fa49d0cd"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Check authentication
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Verify user is admin from 'users' collection
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+
+                if (!userDoc.exists() || userDoc.data().role !== 'admin') {
+                    await signOut(auth);
+                    sessionStorage.removeItem('adminUser');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const userData = userDoc.data();
+                document.getElementById('userName').textContent = userData.name || user.email.split('@')[0];
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('userAvatar').textContent = (userData.name || user.email)[0].toUpperCase();
+
+                loadDashboardData();
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.href = 'login.html';
+            }
+        });
+
+        window.logout = async function() {
+            try {
+                await signOut(auth);
+                sessionStorage.removeItem('adminUser');
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        };
+
+        async function loadDashboardData() {
+            try {
+                console.log('=== LOADING DASHBOARD DATA ===');
+                console.log('Current user:', auth.currentUser);
+                console.log('User email:', auth.currentUser?.email);
+                console.log('User UID:', auth.currentUser?.uid);
+
+                // Load all orders (without orderBy to avoid index issues)
+                let orders = [];
+                try {
+                    console.log('Attempting to load orders collection...');
+                    const ordersSnapshot = await getDocs(collection(db, 'orders'));
+                    console.log('Orders snapshot size:', ordersSnapshot.size);
+
+                    ordersSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        orders.push({ id: doc.id, ...data });
+                    });
+                    console.log('✓ Loaded orders:', orders.length);
+                } catch (e) {
+                    console.error('❌ ERROR loading orders collection:', e);
+                    console.error('Error code:', e.code);
+                    console.error('Error message:', e.message);
+                    if (e.code === 'permission-denied') {
+                        console.error('🔒 PERMISSION DENIED for orders collection');
+                    }
+                }
+
+                // Load completed orders for revenue (orders that have been PAID)
+                let completedOrders = [];
+                try {
+                    console.log('Attempting to load completed_orders collection...');
+                    const completedSnapshot = await getDocs(collection(db, 'completed_orders'));
+                    console.log('Completed_orders snapshot size:', completedSnapshot.size);
+
+                    completedSnapshot.forEach(doc => {
+                        completedOrders.push({ id: doc.id, ...doc.data() });
+                    });
+                    console.log('✓ Loaded completed orders (paid):', completedOrders.length);
+                } catch (e) {
+                    console.error('❌ ERROR loading completed_orders collection:', e);
+                    console.error('Error code:', e.code);
+                    console.error('Error message:', e.message);
+                    if (e.code === 'permission-denied') {
+                        console.error('🔒 PERMISSION DENIED for completed_orders collection');
+                    }
+                }
+
+                // Calculate stats
+                const currentMonth = new Date().getMonth();
+                const currentYear = new Date().getFullYear();
+
+                // TOTAL REVENUE: Calculate from ALL PAID orders
+                // 1. All orders in 'completed_orders' collection (new completed orders)
+                // 2. Orders in 'orders' collection with orderStatus 'paid' or 'completed' (old data before fix)
+                const oldPaidOrders = orders.filter(o => {
+                    const status = o.orderStatus || o.status;
+                    return status === 'paid' || status === 'completed';
+                });
+                const allCompletedOrders = [...completedOrders, ...oldPaidOrders];
+
+                const totalRevenue = allCompletedOrders.reduce((sum, order) => {
+                    const price = order.totalAmount || order.totalPrice || order.total || order.price || order.subtotal || 0;
+                    const status = order.orderStatus || order.status;
+                    console.log('Order:', order.id, 'Status:', status, 'Price:', price);
+                    return sum + price;
+                }, 0);
+
+                console.log('Paid orders from completed_orders:', completedOrders.length);
+                console.log('Old paid orders still in orders collection:', oldPaidOrders.length);
+                console.log('Total paid orders:', allCompletedOrders.length);
+                console.log('Total Revenue from all paid orders:', totalRevenue);
+
+                document.getElementById('totalRevenue').textContent = `RM ${totalRevenue.toFixed(2)}`;
+
+                // TOTAL ORDERS: Count from completed_orders (all paid/completed orders)
+                document.getElementById('totalOrders').textContent = allCompletedOrders.length;
+
+                // TOTAL CUSTOMERS: Count unique userId/customerId from completed orders (yang dah buat pembelian)
+                const uniqueCustomers = new Set();
+                allCompletedOrders.forEach(order => {
+                    const customerId = order.userId || order.customerId || order.uid;
+                    if (customerId) {
+                        uniqueCustomers.add(customerId);
+                    }
+                });
+                const customerCount = uniqueCustomers.size;
+                document.getElementById('totalCustomers').textContent = customerCount;
+                console.log('Total unique customers from completed orders:', customerCount);
+
+                // For charts, filter current month orders
+                const currentMonthOrders = allCompletedOrders.filter(order => {
+                    const timestamp = order.timestamp || order.createdAt || order.date;
+                    if (!timestamp) {
+                        console.log('Order without timestamp:', order);
+                        return false;
+                    }
+                    const orderDate = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+                    console.log('Order date:', orderDate, 'Month:', orderDate.getMonth(), 'Year:', orderDate.getFullYear());
+                    console.log('Current month:', currentMonth, 'Current year:', currentYear);
+                    return orderDate.getMonth() === currentMonth && orderDate.getFullYear() === currentYear;
+                });
+                console.log('Current month orders for charts:', currentMonthOrders.length);
+                console.log('Current month orders data:', currentMonthOrders);
+
+                // Load coffees (products)
+                const coffeesSnapshot = await getDocs(collection(db, 'coffees'));
+                document.getElementById('totalProducts').textContent = coffeesSnapshot.size;
+                console.log('Total products:', coffeesSnapshot.size);
+
+                // Combine orders from both collections for recent orders table
+                const allOrdersForTable = [...orders, ...completedOrders];
+                console.log('Total orders for table (orders + completed):', allOrdersForTable.length);
+
+                // Sort all orders by timestamp (manual sort)
+                const sortedOrders = allOrdersForTable.sort((a, b) => {
+                    const aTime = a.timestamp || a.createdAt || a.date;
+                    const bTime = b.timestamp || b.createdAt || b.date;
+                    if (!aTime) return 1;
+                    if (!bTime) return -1;
+                    const aDate = aTime.toDate ? aTime.toDate() : new Date(aTime);
+                    const bDate = bTime.toDate ? bTime.toDate() : new Date(bTime);
+                    return bDate - aDate;
+                });
+
+                // Update recent orders table (show most recent 10 orders from both collections)
+                updateOrdersTable(sortedOrders.slice(0, 10));
+
+                // Create revenue chart
+                createRevenueChart(currentMonthOrders);
+
+                // Create category chart
+                createCategoryChart(allCompletedOrders);
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                alert('Error loading dashboard: ' + error.message);
+                // Show error message to user
+                document.getElementById('totalRevenue').textContent = 'RM 0.00';
+                document.getElementById('totalOrders').textContent = '0';
+                document.getElementById('totalCustomers').textContent = '0';
+                document.getElementById('totalProducts').textContent = '0';
+            }
+        }
+
+        function updateOrdersTable(orders) {
+            const tbody = document.getElementById('ordersTableBody');
+
+            if (orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #636e72;">Belum ada order</td></tr>';
+                return;
+            }
+
+            // Debug: Log first order to see available fields
+            if (orders.length > 0) {
+                console.log('=== SAMPLE ORDER FROM RECENT ORDERS TABLE ===');
+                console.log('Sample order data:', orders[0]);
+                console.log('Available fields:', Object.keys(orders[0]));
+                console.log('Full order object:', JSON.stringify(orders[0], null, 2));
+            }
+
+            tbody.innerHTML = orders.map((order, index) => {
+                // Timestamp - primary field is 'createdAt'
+                const timestamp = order.createdAt || order.timestamp || order.date;
+                const orderDate = timestamp?.toDate ? timestamp.toDate() : (timestamp ? new Date(timestamp) : null);
+                const dateStr = orderDate ? orderDate.toLocaleDateString('en-MY', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }) : 'N/A';
+
+                // Price - primary field is 'totalAmount'
+                const price = order.totalAmount || order.totalPrice || order.total || order.price || order.subtotal || 0;
+
+                // Debug: Log if price is 0
+                if (index === 0) {
+                    console.log('Order price fields:', {
+                        totalAmount: order.totalAmount,
+                        totalPrice: order.totalPrice,
+                        total: order.total,
+                        price: order.price,
+                        subtotal: order.subtotal,
+                        finalPrice: price
+                    });
+                }
+
+                // Status - primary field is 'orderStatus'
+                const status = order.orderStatus || order.status || 'completed';
+
+                return `
+                    <tr>
+                        <td>#${order.orderNumber || order.id.substring(0, 8)}</td>
+                        <td>${order.userName || order.customerName || 'Customer'}</td>
+                        <td>${order.totalItems || order.items?.length || order.quantity || 1} items</td>
+                        <td>RM ${price.toFixed(2)}</td>
+                        <td><span class="status-badge ${status}">${status}</span></td>
+                        <td>${dateStr}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function createRevenueChart(orders) {
+            console.log('Creating revenue chart with orders:', orders.length);
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+
+            // Group orders by day
+            const revenueByDay = {};
+            const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                revenueByDay[i] = 0;
+            }
+
+            orders.forEach(order => {
+                console.log('Processing order for chart:', order);
+                const timestamp = order.timestamp || order.createdAt || order.date;
+                const orderDate = timestamp?.toDate ? timestamp.toDate() : (timestamp ? new Date(timestamp) : null);
+                const day = orderDate?.getDate();
+                console.log('Order day:', day, 'Date:', orderDate);
+                if (day) {
+                    const price = order.totalAmount || order.totalPrice || order.total || order.price || order.subtotal || 0;
+                    console.log('Adding price to day', day, ':', price);
+                    revenueByDay[day] += price;
+                }
+            });
+
+            console.log('Revenue by day:', revenueByDay);
+
+            const labels = Object.keys(revenueByDay);
+            const data = Object.values(revenueByDay);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Revenue (RM)',
+                        data: data,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'RM ' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createCategoryChart(orders) {
+            console.log('Creating category chart with orders:', orders.length);
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+
+            // Count coffee purchases by name from items array
+            const categoryCount = {};
+
+            orders.forEach(order => {
+                console.log('Processing order for category:', order.id);
+
+                // Get coffee items from items array
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(item => {
+                        const coffeeName = item.coffeeName || item.name || 'Unknown';
+                        const quantity = item.quantity || 1;
+
+                        console.log('Coffee:', coffeeName, 'Quantity:', quantity);
+
+                        // Add to count
+                        if (coffeeName && coffeeName !== 'Unknown') {
+                            categoryCount[coffeeName] = (categoryCount[coffeeName] || 0) + quantity;
+                        }
+                    });
+                } else if (order.coffeeName) {
+                    // Fallback to direct coffeeName field if items array doesn't exist
+                    const quantity = order.totalItems || order.quantity || 1;
+                    categoryCount[order.coffeeName] = (categoryCount[order.coffeeName] || 0) + quantity;
+                }
+            });
+
+            console.log('Coffee category count:', categoryCount);
+            console.log('Total unique coffees:', Object.keys(categoryCount).length);
+            console.log('Total cups sold:', Object.values(categoryCount).reduce((a, b) => a + b, 0));
+
+            const labels = Object.keys(categoryCount).length > 0 ? Object.keys(categoryCount) : ['No Data'];
+            const data = Object.values(categoryCount).length > 0 ? Object.values(categoryCount) : [1];
+
+            // Generate diverse colors
+            const colors = [
+                '#10b981', // Green
+                '#3b82f6', // Blue
+                '#f59e0b', // Orange
+                '#ef4444', // Red
+                '#8b5cf6', // Purple
+                '#ec4899', // Pink
+                '#14b8a6', // Teal
+                '#f97316', // Dark Orange
+                '#6366f1', // Indigo
+                '#84cc16', // Lime
+            ];
+
+            const backgroundColors = labels.map((_, index) => colors[index % colors.length]);
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                },
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    if (data.labels.length && data.datasets.length) {
+                                        return data.labels.map((label, i) => {
+                                            const value = data.datasets[0].data[i];
+                                            return {
+                                                text: `${label}: ${value} ${value === 1 ? 'cup' : 'cups'}`,
+                                                fillStyle: data.datasets[0].backgroundColor[i],
+                                                hidden: false,
+                                                index: i
+                                            };
+                                        });
+                                    }
+                                    return [];
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${label}: ${value} cups (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

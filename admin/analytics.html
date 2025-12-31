@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - Kopi Kap Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f6fa;
+            color: #2d3436;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #0f6b3e 0%, #16a34a 100%);
+            padding: 30px 0;
+            color: white;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
+
+        .logo h1 {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .logo .admin-tag {
+            font-size: 0.8em;
+            opacity: 0.9;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin: 5px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 30px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left: 4px solid white;
+        }
+
+        .nav-link svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+        }
+
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            font-size: 1.8em;
+            color: #2d3436;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #ee5a52;
+            transform: translateY(-2px);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .metric-label {
+            color: #636e72;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #2d3436;
+            margin-bottom: 8px;
+        }
+
+        .metric-change {
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .metric-change.positive {
+            color: #10b981;
+        }
+
+        .metric-change.negative {
+            color: #ef4444;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .chart-header-left h3 {
+            font-size: 1.3em;
+            color: #2d3436;
+            margin-bottom: 5px;
+        }
+
+        .chart-header-left p {
+            color: #636e72;
+            font-size: 0.9em;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .chart-type-selector {
+            display: flex;
+            gap: 5px;
+            background: #f8f9fa;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .chart-type-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            color: #636e72;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .chart-type-btn.active {
+            background: #10b981;
+            color: white;
+        }
+
+        .download-dropdown {
+            position: relative;
+        }
+
+        .download-btn {
+            padding: 6px 12px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: #059669;
+        }
+
+        .download-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            margin-top: 5px;
+            min-width: 120px;
+            z-index: 1000;
+        }
+
+        .download-menu.show {
+            display: block;
+        }
+
+        .download-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 0.9em;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        .download-option:last-child {
+            border-bottom: none;
+        }
+
+        .download-option:hover {
+            background: #f8f9fa;
+            color: #10b981;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .period-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .period-btn {
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: #636e72;
+        }
+
+        .period-btn.active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-color: #10b981;
+        }
+
+        .insights-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .insights-header {
+            margin-bottom: 20px;
+        }
+
+        .insights-header h3 {
+            font-size: 1.3em;
+            color: #2d3436;
+        }
+
+        .insight-item {
+            padding: 15px;
+            border-left: 4px solid #10b981;
+            background: #f8f9fa;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+
+        .insight-item strong {
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>Kopi Kap</h1>
+            <p class="admin-tag">Admin Portal</p>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                    </svg>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="orders.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                    </svg>
+                    Orders
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="products.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+                    </svg>
+                    Products
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="users.html" class="nav-link">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                    </svg>
+                    Users
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="analytics.html" class="nav-link active">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                    </svg>
+                    Analytics
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h2>Analytics & Reports</h2>
+                <p style="color: #636e72; font-size: 0.9em;">Sales analytics and business insights</p>
+            </div>
+            <div class="header-right">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div>
+                        <div style="font-weight: 600;" id="userName">Admin</div>
+                        <div style="font-size: 0.85em; color: #636e72;" id="userEmail">admin@kopikap.com</div>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="period-selector">
+            <button class="period-btn" onclick="changePeriod('today', event)">Today</button>
+            <button class="period-btn" onclick="changePeriod('week', event)">This Week</button>
+            <button class="period-btn active" onclick="changePeriod('month', event)">This Month</button>
+            <button class="period-btn" onclick="changePeriod('year', event)">This Year</button>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Total Revenue</div>
+                <div class="metric-value" id="totalRevenue">RM 0.00</div>
+                <div class="metric-change positive" id="revenueChange">+0%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Total Orders</div>
+                <div class="metric-value" id="totalOrders">0</div>
+                <div class="metric-change positive" id="ordersChange">+0%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Average Order Value</div>
+                <div class="metric-value" id="avgOrderValue">RM 0.00</div>
+                <div class="metric-change positive" id="avgChange">+0%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Total Customers</div>
+                <div class="metric-value" id="totalCustomers">0</div>
+                <div class="metric-change positive" id="customersChange">+0%</div>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-header-left">
+                        <h3>Revenue Trend</h3>
+                        <p>Daily revenue for selected period</p>
+                    </div>
+                    <div class="chart-controls">
+                        <div class="chart-type-selector">
+                            <button class="chart-type-btn active" onclick="changeChartType('revenueTrend', 'line', this)">Line</button>
+                            <button class="chart-type-btn" onclick="changeChartType('revenueTrend', 'bar', this)">Bar</button>
+                        </div>
+                        <div class="download-dropdown">
+                            <button class="download-btn" onclick="toggleDownloadMenu('revenueTrend')">
+                                <span>📥</span> Export
+                            </button>
+                            <div class="download-menu" id="downloadMenu-revenueTrend">
+                                <div class="download-option" onclick="downloadChart('revenueTrend', 'png')">PNG</div>
+                                <div class="download-option" onclick="downloadChart('revenueTrend', 'jpg')">JPG</div>
+                                <div class="download-option" onclick="downloadChart('revenueTrend', 'svg')">SVG</div>
+                                <div class="download-option" onclick="downloadChart('revenueTrend', 'pdf')">PDF</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="revenueTrendChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-header-left">
+                        <h3>Top Selling Products</h3>
+                        <p>Most ordered coffee products</p>
+                    </div>
+                    <div class="chart-controls">
+                        <div class="chart-type-selector">
+                            <button class="chart-type-btn active" onclick="changeChartType('topProducts', 'bar', this)">Bar</button>
+                            <button class="chart-type-btn" onclick="changeChartType('topProducts', 'pie', this)">Pie</button>
+                            <button class="chart-type-btn" onclick="changeChartType('topProducts', 'doughnut', this)">Donut</button>
+                        </div>
+                        <div class="download-dropdown">
+                            <button class="download-btn" onclick="toggleDownloadMenu('topProducts')">
+                                <span>📥</span> Export
+                            </button>
+                            <div class="download-menu" id="downloadMenu-topProducts">
+                                <div class="download-option" onclick="downloadChart('topProducts', 'png')">PNG</div>
+                                <div class="download-option" onclick="downloadChart('topProducts', 'jpg')">JPG</div>
+                                <div class="download-option" onclick="downloadChart('topProducts', 'svg')">SVG</div>
+                                <div class="download-option" onclick="downloadChart('topProducts', 'pdf')">PDF</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="topProductsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-header-left">
+                        <h3>Order Status Distribution</h3>
+                        <p>Orders by status</p>
+                    </div>
+                    <div class="chart-controls">
+                        <div class="chart-type-selector">
+                            <button class="chart-type-btn active" onclick="changeChartType('status', 'doughnut', this)">Donut</button>
+                            <button class="chart-type-btn" onclick="changeChartType('status', 'pie', this)">Pie</button>
+                            <button class="chart-type-btn" onclick="changeChartType('status', 'bar', this)">Bar</button>
+                        </div>
+                        <div class="download-dropdown">
+                            <button class="download-btn" onclick="toggleDownloadMenu('status')">
+                                <span>📥</span> Export
+                            </button>
+                            <div class="download-menu" id="downloadMenu-status">
+                                <div class="download-option" onclick="downloadChart('status', 'png')">PNG</div>
+                                <div class="download-option" onclick="downloadChart('status', 'jpg')">JPG</div>
+                                <div class="download-option" onclick="downloadChart('status', 'svg')">SVG</div>
+                                <div class="download-option" onclick="downloadChart('status', 'pdf')">PDF</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-header-left">
+                        <h3>Revenue by Hour</h3>
+                        <p>Peak hours analysis</p>
+                    </div>
+                    <div class="chart-controls">
+                        <div class="chart-type-selector">
+                            <button class="chart-type-btn active" onclick="changeChartType('hourly', 'bar', this)">Bar</button>
+                            <button class="chart-type-btn" onclick="changeChartType('hourly', 'line', this)">Line</button>
+                        </div>
+                        <div class="download-dropdown">
+                            <button class="download-btn" onclick="toggleDownloadMenu('hourly')">
+                                <span>📥</span> Export
+                            </button>
+                            <div class="download-menu" id="downloadMenu-hourly">
+                                <div class="download-option" onclick="downloadChart('hourly', 'png')">PNG</div>
+                                <div class="download-option" onclick="downloadChart('hourly', 'jpg')">JPG</div>
+                                <div class="download-option" onclick="downloadChart('hourly', 'svg')">SVG</div>
+                                <div class="download-option" onclick="downloadChart('hourly', 'pdf')">PDF</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="hourlyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="insights-section">
+            <div class="insights-header">
+                <h3>Business Insights</h3>
+            </div>
+            <div id="insightsContainer">
+                <div style="text-align: center; padding: 40px; color: #636e72;">Loading insights...</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, getDocs, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9EMyZgu7FsJOwzYB59DxdAJYTK5mwZqc",
+            authDomain: "finalyearproject-b3787.firebaseapp.com",
+            projectId: "finalyearproject-b3787",
+            storageBucket: "finalyearproject-b3787.firebasestorage.app",
+            messagingSenderId: "581749071416",
+            appId: "1:581749071416:android:ea60d7d3b7f238fa49d0cd"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentPeriod = 'month';
+        let allOrders = [];
+        let completedOrders = [];
+        let charts = {};
+        let chartData = {};
+        let chartTypes = {
+            revenueTrend: 'line',
+            topProducts: 'bar',
+            status: 'doughnut',
+            hourly: 'bar'
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (!userDoc.exists() || userDoc.data().role !== 'admin') {
+                    await signOut(auth);
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const userData = userDoc.data();
+                document.getElementById('userName').textContent = userData.name || 'Admin';
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('userAvatar').textContent = (userData.name || user.email)[0].toUpperCase();
+
+                await loadAnalytics();
+            } catch (error) {
+                console.error('Auth error:', error);
+                window.location.href = 'login.html';
+            }
+        });
+
+        window.logout = async function() {
+            try {
+                await signOut(auth);
+                sessionStorage.removeItem('adminUser');
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        };
+
+        async function loadAnalytics() {
+            try {
+                // Load all orders
+                const ordersSnapshot = await getDocs(collection(db, 'orders'));
+                allOrders = [];
+                ordersSnapshot.forEach(doc => {
+                    allOrders.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Load completed orders
+                const completedSnapshot = await getDocs(collection(db, 'completed_orders'));
+                completedOrders = [];
+                completedSnapshot.forEach(doc => {
+                    completedOrders.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Load users for customer count
+                const usersSnapshot = await getDocs(collection(db, 'users'));
+                const customers = Array.from(usersSnapshot.docs).filter(doc => {
+                    const role = doc.data().role;
+                    return !role || role === 'user';
+                });
+
+                document.getElementById('totalCustomers').textContent = customers.length;
+
+                console.log('Loaded orders:', allOrders.length);
+                console.log('Loaded completed orders:', completedOrders.length);
+                console.log('Loaded customers:', customers.length);
+
+                updateMetrics();
+                createCharts();
+                generateInsights();
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+
+        function filterOrdersByPeriod(orders) {
+            const now = new Date();
+            const filtered = orders.filter(order => {
+                const timestamp = order.completedAt || order.createdAt || order.timestamp;
+                const orderDate = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
+                if (!orderDate) return false;
+
+                switch(currentPeriod) {
+                    case 'today':
+                        return orderDate.toDateString() === now.toDateString();
+                    case 'week':
+                        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        return orderDate >= weekAgo;
+                    case 'month':
+                        return orderDate.getMonth() === now.getMonth() &&
+                               orderDate.getFullYear() === now.getFullYear();
+                    case 'year':
+                        return orderDate.getFullYear() === now.getFullYear();
+                    default:
+                        return true;
+                }
+            });
+            return filtered;
+        }
+
+        function updateMetrics() {
+            const periodOrders = filterOrdersByPeriod(completedOrders);
+
+            const totalRevenue = periodOrders.reduce((sum, order) => sum + (order.totalAmount || order.totalPrice || 0), 0);
+            const totalOrdersCount = periodOrders.length;
+            const avgOrderValue = totalOrdersCount > 0 ? totalRevenue / totalOrdersCount : 0;
+
+            document.getElementById('totalRevenue').textContent = `RM ${totalRevenue.toFixed(2)}`;
+            document.getElementById('totalOrders').textContent = totalOrdersCount;
+            document.getElementById('avgOrderValue').textContent = `RM ${avgOrderValue.toFixed(2)}`;
+        }
+
+        function createCharts() {
+            const periodOrders = filterOrdersByPeriod(completedOrders);
+
+            // Revenue Trend Chart
+            createRevenueTrendChart(periodOrders);
+
+            // Top Products Chart
+            createTopProductsChart(periodOrders);
+
+            // Status Distribution Chart
+            createStatusChart(allOrders);
+
+            // Hourly Revenue Chart
+            createHourlyChart(periodOrders);
+        }
+
+        function createRevenueTrendChart(orders) {
+            if (charts.revenueTrend) charts.revenueTrend.destroy();
+
+            const ctx = document.getElementById('revenueTrendChart').getContext('2d');
+
+            const revenueByDate = {};
+            orders.forEach(order => {
+                const timestamp = order.completedAt || order.createdAt || order.timestamp;
+                const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
+                if (date) {
+                    const dateKey = date.toLocaleDateString();
+                    revenueByDate[dateKey] = (revenueByDate[dateKey] || 0) + (order.totalAmount || order.totalPrice || 0);
+                }
+            });
+
+            const labels = Object.keys(revenueByDate).slice(-30);
+            const data = labels.map(label => revenueByDate[label]);
+
+            chartData.revenueTrend = { labels, data };
+
+            charts.revenueTrend = new Chart(ctx, {
+                type: chartTypes.revenueTrend,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Revenue (RM)',
+                        data: data,
+                        borderColor: '#10b981',
+                        backgroundColor: chartTypes.revenueTrend === 'bar' ? '#10b981' : 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: chartTypes.revenueTrend === 'line'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function createTopProductsChart(orders) {
+            if (charts.topProducts) charts.topProducts.destroy();
+
+            const ctx = document.getElementById('topProductsChart').getContext('2d');
+
+            const productCount = {};
+            orders.forEach(order => {
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(item => {
+                        const name = item.coffeeName || item.name || 'Unknown';
+                        const quantity = item.quantity || 1;
+                        productCount[name] = (productCount[name] || 0) + quantity;
+                    });
+                }
+            });
+
+            const sorted = Object.entries(productCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            const labels = sorted.map(([name]) => name);
+            const data = sorted.map(([, count]) => count);
+
+            chartData.topProducts = { labels, data };
+
+            const isPieType = chartTypes.topProducts === 'pie' || chartTypes.topProducts === 'doughnut';
+
+            charts.topProducts = new Chart(ctx, {
+                type: chartTypes.topProducts,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Orders',
+                        data: data,
+                        backgroundColor: isPieType ? [
+                            '#10b981',
+                            '#34d399',
+                            '#6ee7b7',
+                            '#a7f3d0',
+                            '#059669'
+                        ] : '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: isPieType }
+                    }
+                }
+            });
+        }
+
+        function createStatusChart(orders) {
+            if (charts.status) charts.status.destroy();
+
+            const ctx = document.getElementById('statusChart').getContext('2d');
+
+            const statusCount = {};
+            orders.forEach(order => {
+                const status = order.orderStatus || order.status || 'pending';
+                statusCount[status] = (statusCount[status] || 0) + 1;
+            });
+
+            const labels = Object.keys(statusCount);
+            const data = Object.values(statusCount);
+
+            chartData.status = { labels, data };
+
+            const isPieType = chartTypes.status === 'pie' || chartTypes.status === 'doughnut';
+
+            charts.status = new Chart(ctx, {
+                type: chartTypes.status,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Orders',
+                        data: data,
+                        backgroundColor: isPieType ? [
+                            '#10b981',
+                            '#34d399',
+                            '#6ee7b7',
+                            '#a7f3d0',
+                            '#059669',
+                            '#047857'
+                        ] : '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: isPieType }
+                    }
+                }
+            });
+        }
+
+        function createHourlyChart(orders) {
+            if (charts.hourly) charts.hourly.destroy();
+
+            const ctx = document.getElementById('hourlyChart').getContext('2d');
+
+            const hourlyRevenue = {};
+            for (let i = 0; i < 24; i++) {
+                hourlyRevenue[i] = 0;
+            }
+
+            orders.forEach(order => {
+                const timestamp = order.completedAt || order.createdAt || order.timestamp;
+                const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
+                if (date) {
+                    const hour = date.getHours();
+                    hourlyRevenue[hour] += order.totalAmount || order.totalPrice || 0;
+                }
+            });
+
+            const labels = Object.keys(hourlyRevenue).map(h => h + ':00');
+            const data = Object.values(hourlyRevenue);
+
+            chartData.hourly = { labels, data };
+
+            charts.hourly = new Chart(ctx, {
+                type: chartTypes.hourly,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Revenue (RM)',
+                        data: data,
+                        borderColor: '#10b981',
+                        backgroundColor: chartTypes.hourly === 'bar' ? '#10b981' : 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: chartTypes.hourly === 'line'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function generateInsights() {
+            const periodOrders = filterOrdersByPeriod(completedOrders);
+
+            const productCount = {};
+            periodOrders.forEach(order => {
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(item => {
+                        const name = item.coffeeName || item.name || 'Unknown';
+                        const quantity = item.quantity || 1;
+                        productCount[name] = (productCount[name] || 0) + quantity;
+                    });
+                }
+            });
+            const topProduct = Object.entries(productCount).sort((a, b) => b[1] - a[1])[0];
+
+            const hourlyOrders = {};
+            periodOrders.forEach(order => {
+                const timestamp = order.completedAt || order.createdAt || order.timestamp;
+                const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
+                if (date) {
+                    const hour = date.getHours();
+                    hourlyOrders[hour] = (hourlyOrders[hour] || 0) + 1;
+                }
+            });
+            const peakHour = Object.entries(hourlyOrders).sort((a, b) => b[1] - a[1])[0];
+
+            const totalRevenue = periodOrders.reduce((sum, order) => sum + (order.totalAmount || order.totalPrice || 0), 0);
+            const avgOrderValue = periodOrders.length > 0 ? totalRevenue / periodOrders.length : 0;
+
+            const html = `
+                ${topProduct ? `<div class="insight-item">
+                    <strong>${topProduct[0]}</strong> is the most popular product with ${topProduct[1]} orders this period.
+                </div>` : ''}
+                ${peakHour ? `<div class="insight-item">
+                    Peak ordering hour is <strong>${peakHour[0]}:00</strong> with ${peakHour[1]} orders.
+                </div>` : ''}
+                <div class="insight-item">
+                    Average order value is <strong>RM ${avgOrderValue.toFixed(2)}</strong>.
+                </div>
+                <div class="insight-item">
+                    Total of <strong>${periodOrders.length} completed orders</strong> generating <strong>RM ${totalRevenue.toFixed(2)}</strong> in revenue.
+                </div>
+            `;
+
+            document.getElementById('insightsContainer').innerHTML = html || '<p style="text-align: center; color: #636e72;">No insights available</p>';
+        }
+
+        window.changePeriod = function(period, event) {
+            currentPeriod = period;
+
+            document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            updateMetrics();
+            createCharts();
+            generateInsights();
+        };
+
+        window.changeChartType = function(chartName, type, button) {
+            // Update active button
+            const parent = button.parentElement;
+            parent.querySelectorAll('.chart-type-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            // Update chart type
+            chartTypes[chartName] = type;
+
+            // Recreate chart
+            if (chartName === 'revenueTrend') {
+                createRevenueTrendChart(filterOrdersByPeriod(completedOrders));
+            } else if (chartName === 'topProducts') {
+                createTopProductsChart(filterOrdersByPeriod(completedOrders));
+            } else if (chartName === 'status') {
+                createStatusChart(allOrders);
+            } else if (chartName === 'hourly') {
+                createHourlyChart(filterOrdersByPeriod(completedOrders));
+            }
+        };
+
+        window.toggleDownloadMenu = function(chartName) {
+            const menu = document.getElementById(`downloadMenu-${chartName}`);
+            // Close all other menus
+            document.querySelectorAll('.download-menu').forEach(m => {
+                if (m !== menu) m.classList.remove('show');
+            });
+            menu.classList.toggle('show');
+        };
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.download-dropdown')) {
+                document.querySelectorAll('.download-menu').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
+        });
+
+        window.downloadChart = async function(chartName, format) {
+            const canvas = document.getElementById(`${chartName}Chart`);
+            const chart = charts[chartName];
+
+            try {
+                if (format === 'png' || format === 'jpg') {
+                    const url = canvas.toDataURL(`image/${format}`);
+                    const link = document.createElement('a');
+                    link.download = `${chartName}-chart.${format}`;
+                    link.href = url;
+                    link.click();
+                } else if (format === 'svg') {
+                    // For SVG, we'll convert canvas to SVG
+                    alert('SVG export coming soon! Use PNG for now.');
+                } else if (format === 'pdf') {
+                    // Use jsPDF
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF();
+                    const imgData = canvas.toDataURL('image/png');
+                    pdf.addImage(imgData, 'PNG', 10, 10, 190, 100);
+                    pdf.save(`${chartName}-chart.pdf`);
+                }
+
+                // Close dropdown
+                document.getElementById(`downloadMenu-${chartName}`).classList.remove('show');
+            } catch (error) {
+                console.error('Error downloading chart:', error);
+                alert('Failed to download chart');
+            }
+        };
+    </script>
+</body>
+</html>
